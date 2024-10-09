@@ -11,7 +11,6 @@
     <properties>
         <maven.compiler.source>18</maven.compiler.source>
         <maven.compiler.target>18</maven.compiler.target>
-        <project.build.directory>C:\Users\-sSs-\IdeaProjects\project-maven\lib\</project.build.directory>
     </properties>
 
     <dependencies>
@@ -43,6 +42,16 @@
     </dependencies>
 
     <build>
+<resources>
+        <resource>
+            <directory>${project.build.directory}/dependency</directory>
+            <targetPath>lib</targetPath>
+            <includes>
+                <include>**/*.jar</include>
+            </includes>
+        </resource>
+</resources>
+
         <plugins>
             <!-- Usual compilation -->
             <plugin>
@@ -69,17 +78,19 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.5.1</version>
                 <configuration>
-                    <outputDirectory>
-                        ${project.build.directory}
-                    </outputDirectory>
+                    <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                    <includeScope>compile</includeScope>
                 </configuration>
                 <executions>
                 <execution>
                     <id>copy-dependencies</id>
-                    <phase>package</phase>
+                    <phase>generate-resources</phase>
                     <goals>
                         <goal>copy-dependencies</goal>
                     </goals>
+                    <configuration>
+                        <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                    </configuration>
                 </execution>
             </executions>
             </plugin>
@@ -89,21 +100,16 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-                    <resource>
-                        <includes>
-                            <include>**/lib/*.jar</include>
-                        </includes>
-                    </resource>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>${project.build.directory}</classpathPrefix>
-                            <classpathSuffix>.jar</classpathSuffix>
+                            <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader</mainClass>
-                            <manifestEntries>
-                                <Rsrc-Main-Class>com.javarush.games.racer.RacerGame</Rsrc-Main-Class>
-                            </manifestEntries>
                         </manifest>
+                        <manifestEntries>
+                            <Rsrc-Main-Class>com.javarush.games.racer.RacerGame</Rsrc-Main-Class>
+                            <Class-path>./</Class-path>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
@@ -111,7 +117,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12.4</version>
+                <version>2.22.2</version>
                 <configuration>
                     <excludes>
                         <exclude>**/StrangeTest.java</exclude>
